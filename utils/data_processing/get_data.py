@@ -4,7 +4,7 @@ import json
 from typing import Dict
 
 
-def get_data(location: str = 'Paris', checkin: str = str(current_date), checkout: str = str(next_date),
+def new_data(location: str = 'Paris', checkin: str = str(current_date), checkout: str = str(next_date),
              adults: str = '1',
              children: str = '0', infants: str = '0', page: str = '0') -> Dict:
     querystring["location"] = location
