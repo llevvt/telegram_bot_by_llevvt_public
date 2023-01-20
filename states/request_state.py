@@ -5,3 +5,7 @@ class RequestState(StatesGroup):
     city = State()
     check_in_date = State()
     check_out_date = State()
+    adults = State()
+    children = State()
+    infants = State()
+    page = State()
