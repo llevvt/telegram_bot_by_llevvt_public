@@ -38,7 +38,7 @@ def get_check_in_date(message):
             if checking_date(message.text):
                 data['checkin'] = message.text
             else:
-                data['checkin'] = current_date
+                data['checkin'] = str(current_date)
 
     else:
         bot.send_message(message.from_user.id, 'Неправильный формат даты. Дата должна быть в формате YYYY-MM-DD.\n'
@@ -55,7 +55,7 @@ def get_check_out_day(message):
             if checking_date(message.text, compare_date=data['checkin']):
                 data['checkout'] = message.text
             else:
-                data['checkout'] = next_date
+                data['checkout'] = str(next_date)
 
     else:
         bot.send_message(message.from_user.id, 'Неправильный формат даты. Дата должна быть в формате YYYY-MM-DD.\n'
