@@ -10,6 +10,7 @@ import json
 import re
 from utils.other_utils.cheking_date import checking_date
 from config_data.request_config import current_date, next_date
+from keyboards.reply.yes_no import yes_no
 
 
 @bot.message_handler(commands=['low'])
@@ -20,12 +21,16 @@ def get_data(message: Message) -> None:
 
 @bot.message_handler(state=RequestState.city)
 def get_city(message: Message):
-    bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введи дату заезда в формате YYYY-MM-DD')
-    bot.set_state(message.from_user.id, RequestState.check_in_date, message.chat.id)
+    if re.match(r'\b[A-Z][a-z]+\b', message.text):
+        bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введи дату заезда в формате YYYY-MM-DD')
+        bot.set_state(message.from_user.id, RequestState.check_in_date, message.chat.id)
 
-    with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        data['city'] = message.text
-    return
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            data['city'] = message.text
+    else:
+        bot.send_message(message.from_user.id, 'Неверно введено название города. '
+                                               '\nНавание города дольжно быть написано '
+                                               'с большой буквы и на английском языке ')
 
 
 @bot.message_handler(state=RequestState.check_in_date)
@@ -65,14 +70,30 @@ def get_check_out_day(message):
 @bot.message_handler(state=RequestState.adults)
 def get_adults(message):
     if str(message.text).isdigit():
-        bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите количество детей, которые поедут')
-        bot.set_state(message.from_user.id, RequestState.children, message.chat.id)
+        bot.send_message(message.from_user.id, 'Спасибо, записал! Поедут ли с Вами дети? Для ответа нажмите на кнопку.',
+                         reply_markup=yes_no())
+        bot.set_state(message.from_user.id, RequestState.children_bool, message.chat.id)
 
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['adults'] = message.text
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте количество взрослых числом!\n'
                                                'В вашем сообщении не должно быть букв!')
+
+
+@bot.message_handler(content_types=['text'], state=RequestState.children_bool)
+def if_children(message):
+    if message.text == 'Да':
+        bot.send_message(message.from_user.id, 'Введите пожалуйста количество детей, которые с Вами поедут')
+        bot.set_state(message.from_user.id, RequestState.children, message.chat.id)
+    elif message.text == 'Нет':
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            data['children'] = '0'
+            data['infants'] = '0'
+        bot.set_state(message.from_user.id, RequestState.page, message.chat.id)
+        bot.send_message(message.from_user.id, 'Спасибо! Теперь введите номер страницы для поиска')
+    else:
+        bot.send_message(message.from_user.id, 'Для ответа, пожалуйста, нажмите на кнопку.')
 
 
 @bot.message_handler(state=RequestState.children)

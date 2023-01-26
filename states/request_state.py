@@ -9,3 +9,5 @@ class RequestState(StatesGroup):
     children = State()
     infants = State()
     page = State()
+    children_bool = State()
+
