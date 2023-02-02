@@ -2,3 +2,4 @@
 .idea
 /database/current_request_database/processed_request.json
 /database/history.db
+/bot/
