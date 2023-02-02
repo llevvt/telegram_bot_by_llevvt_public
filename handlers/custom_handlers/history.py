@@ -15,20 +15,18 @@ def history(message: Message):
             cur.execute("SELECT * FROM history WHERE userid='{}'".format(message.from_user.id))
             result = cur.fetchall()
             for i_request in result:
-                text = 'Номер запроса: {request_num}\n' \
-                       'ID пользователя: {user_id}\n' \
+                text = 'ID пользователя: {user_id}\n' \
                        'Ссылка: {url}\n' \
                        'Название отеля: {hotel_name}\n' \
                        'Город: {city}\n' \
                        'Рейтинг: {rating}\n' \
                        'Стоимость: {price}$'.format(
-                        request_num=i_request[0],
-                        user_id=i_request[1],
-                        url=i_request[2],
-                        hotel_name=i_request[3],
-                        city=i_request[4],
-                        rating=i_request[5],
-                        price=i_request[6]
+                        user_id=i_request[0],
+                        url=i_request[1],
+                        hotel_name=i_request[2],
+                        city=i_request[3],
+                        rating=i_request[4],
+                        price=i_request[5]
                         )
                 bot.send_message(message.from_user.id, text)
                 time.sleep(0.5)
