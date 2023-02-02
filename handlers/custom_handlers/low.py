@@ -11,6 +11,7 @@ import re
 from utils.other_utils.cheking_date import checking_date
 from config_data.request_config import current_date, next_date
 from keyboards.reply.yes_no import yes_no
+from handlers.custom_handlers import history, survey
 
 
 @bot.message_handler(commands=['low'])
