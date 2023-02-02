@@ -16,7 +16,7 @@ from keyboards.reply.yes_no import yes_no
 @bot.message_handler(commands=['low'])
 def get_data(message: Message) -> None:
     bot.set_state(message.from_user.id, RequestState.city, message.chat.id)
-    bot.send_message(message.from_user.id, f'Введи город назначения на английском')
+    bot.send_message(message.from_user.id, 'Введи город назначения на английском')
 
 
 @bot.message_handler(state=RequestState.city)
@@ -38,7 +38,6 @@ def get_check_in_date(message):
     if re.match(r'\b\d{4}-\d{2}-\d{2}', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введи дату выезда в формате YYYY-MM-DD')
         bot.set_state(message.from_user.id, RequestState.check_out_date, message.chat.id)
-
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             if checking_date(message.text):
                 data['checkin'] = message.text
@@ -81,17 +80,20 @@ def get_adults(message):
                                                'В вашем сообщении не должно быть букв!')
 
 
-@bot.message_handler(content_types=['text'], state=RequestState.children_bool)
+@bot.message_handler(state=RequestState.children_bool)
 def if_children(message):
     if message.text == 'Да':
         bot.send_message(message.from_user.id, 'Введите пожалуйста количество детей, которые с Вами поедут')
         bot.set_state(message.from_user.id, RequestState.children, message.chat.id)
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            data['children_bool'] = 'Да'
     elif message.text == 'Нет':
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['children'] = '0'
             data['infants'] = '0'
-        bot.set_state(message.from_user.id, RequestState.page, message.chat.id)
+            data['children_bool'] = 'Нет'
         bot.send_message(message.from_user.id, 'Спасибо! Теперь введите номер страницы для поиска')
+        bot.set_state(message.from_user.id, RequestState.page, message.chat.id)
     else:
         bot.send_message(message.from_user.id, 'Для ответа, пожалуйста, нажмите на кнопку.')
 
@@ -126,7 +128,6 @@ def get_infants(message):
 def get_page(message):
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал!')
-
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['page'] = message.text
 
@@ -142,15 +143,20 @@ def get_page(message):
         low_offer = get_low(message=message)
         with open(current_request, 'r') as file:
             current_data = json.load(file)
-            result = current_data[low_offer]
-            save_request(result)
-            text = 'Вот ваш вариант!\n'\
-                    '\nНазвание: {name}\n'\
-                    'Ссылка: {link}\n'\
-                    'Рейтинг: {rating}\n'.format(
-                    name=result['name'], link=result['url'], rating=result['rating']
-        )
-            bot.send_message(message.from_user.id, text)
+        result = current_data[low_offer]
+        parameters_for_message = ('name', 'url', 'rating', 'price')
+        for i_param in parameters_for_message:
+            if i_param not in result.keys():
+                result[i_param] = 'Нет информации'
+        save_request(result, user_id=message.from_user.id)
+        text = 'Вот ваш вариант!\n'\
+                '\nНазвание: {name}\n'\
+                'Ссылка: {link}\n'\
+                'Рейтинг: {rating}\n' \
+               'Стоимость: {price}'.format(
+                name=result['name'], link=result['url'], rating=result['rating'], price=result['price']
+    )
+        bot.send_message(message.from_user.id, text)
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте числом номер страницы для поиска!\n'
                                                'В вашем сообщении не должно быть букв!')
@@ -166,8 +172,3 @@ def get_low(message: Message):
         processing_data(request_dict=current_response)
         current_response = sorting_data()
         return current_response[0]
-
-
-
-
-

@@ -1,19 +1,43 @@
 from config_data.pathes_data import history_path
-import json
-from typing import Dict
+import sqlite3
 import os
 
 
-def save_request(request_dict):
+def save_request(request_dict, user_id):
     if os.path.exists(history_path):
-        with open(history_path, 'r') as file:
-            current_dict = json.load(file)
+        with sqlite3.connect(r'{}'.format(history_path)) as database:
+            cur = database.cursor()
+            cur.execute("SELECT * FROM history WHERE userid='{}';".format(str(user_id)))
+            results = cur.fetchall()
+            if len(results) < 10:
+                add_new_object(request_dict, len(results), user_id)
+            else:
+                cur.execute("DELETE FROM history WHERE userid='{}' AND requestid='0'".format(user_id))
+                database.commit()
+                add_new_object(request_dict, 9, user_id)
     else:
-        current_dict = dict()
-    with open(history_path, 'w') as file:
-        if not (0 < len(current_dict.keys()) < 10):
-            for i_key in current_dict.keys():
-                if i_key == 0:
-                    current_dict[i_key - 1] = current_dict[i_key]
-        current_dict[len(current_dict.keys())] = request_dict
-        json.dump(current_dict, file, indent=4)
+        add_new_object(request_dict, 0, user_id)
+
+
+def add_new_object(request_dict, id_num, user_id):
+    new_tuple = (
+        id_num, user_id, request_dict['url'], request_dict['name'], request_dict['city'],
+        str(request_dict['rating']), str(request_dict['price'])
+    )
+
+    with sqlite3.connect(r'{}'.format(history_path)) as database:
+        cur = database.cursor()
+        cur.execute("""CREATE TABLE IF NOT EXISTS history(
+        requestid INT, 
+        userid INT,
+        url TEXT,
+        hotelname TEXT,
+        city TEXT,
+        rating TEXT,
+        price TEXT);
+        """) #Нужно заменить requestid на дату и время
+        database.commit()
+        cur.execute("INSERT INTO history VALUES(?,?,?,?,?,?,?);", new_tuple)
+        database.commit()
+
+

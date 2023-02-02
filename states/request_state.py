@@ -6,8 +6,9 @@ class RequestState(StatesGroup):
     check_in_date = State()
     check_out_date = State()
     adults = State()
+    children_bool = State()
     children = State()
     infants = State()
     page = State()
-    children_bool = State()
+
 
