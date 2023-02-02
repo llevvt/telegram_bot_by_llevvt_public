@@ -1,17 +1,12 @@
 from loader import bot
 from states.request_state import RequestState
 from telebot.types import Message
-from utils.data_processing.get_data import new_data
-from utils.data_processing.processing_data import processing_data
-from utils.data_processing.save_request import save_request
-from utils.data_processing.sorting_data import sorting_data
-from config_data.pathes_data import current_request
-import json
 import re
 from utils.other_utils.cheking_date import checking_date
 from config_data.request_config import current_date, next_date
 from keyboards.reply.yes_no import yes_no
-from handlers.custom_handlers import history, survey
+from handlers.custom_handlers import history, survey, high
+from utils.data_processing.prepare_for_saving import prepare_for_saving
 
 
 @bot.message_handler(commands=['low'])
@@ -36,7 +31,7 @@ def get_city(message: Message):
 
 @bot.message_handler(state=RequestState.check_in_date)
 def get_check_in_date(message):
-    if re.match(r'\b\d{4}-\d{2}-\d{2}', message.text):
+    if re.match(r'\b\d{4}-\d{2}-\d{2}\b', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введи дату выезда в формате YYYY-MM-DD')
         bot.set_state(message.from_user.id, RequestState.check_out_date, message.chat.id)
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -52,7 +47,7 @@ def get_check_in_date(message):
 
 @bot.message_handler(state=RequestState.check_out_date)
 def get_check_out_day(message):
-    if re.match(r'\b\d{4}-\d{2}-\d{2}', message.text):
+    if re.match(r'\b\d{4}-\d{2}-\d{2}\b', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите количество взрослых, которые поедут')
         bot.set_state(message.from_user.id, RequestState.adults, message.chat.id)
 
@@ -141,35 +136,16 @@ def get_page(message):
                f'Количество младенцев: {data["infants"]}\n' \
                f'Страница поиска: {data["page"]}\n'
         bot.send_message(message.from_user.id, text)
-        low_offer = get_low(message=message)
-        with open(current_request, 'r') as file:
-            current_data = json.load(file)
-        result = current_data[low_offer]
-        parameters_for_message = ('name', 'url', 'rating', 'price')
-        for i_param in parameters_for_message:
-            if i_param not in result.keys():
-                result[i_param] = 'Нет информации'
-        save_request(result, user_id=message.from_user.id)
+        result = prepare_for_saving(message=message, command='low')
         text = 'Вот ваш вариант!\n'\
                 '\nНазвание: {name}\n'\
                 'Ссылка: {link}\n'\
                 'Рейтинг: {rating}\n' \
-               'Стоимость: {price}'.format(
+               'Стоимость: {price}$'.format(
                 name=result['name'], link=result['url'], rating=result['rating'], price=result['price']
     )
+
         bot.send_message(message.from_user.id, text)
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте числом номер страницы для поиска!\n'
                                                'В вашем сообщении не должно быть букв!')
-
-
-def get_low(message: Message):
-    with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        current_response = new_data(
-            location=data['city'], checkin=data['checkin'], checkout=data['checkout'],
-            adults=data['adults'], children=data['children'], infants=data['infants'],
-            page=data['page']
-        )
-        processing_data(request_dict=current_response)
-        current_response = sorting_data()
-        return current_response[0]
