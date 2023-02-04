@@ -1,7 +1,7 @@
 from telebot.handler_backends import State, StatesGroup
 
 
-class RequestState(StatesGroup):
+class HighState(StatesGroup):
     city = State()
     check_in_date = State()
     check_out_date = State()
@@ -10,5 +10,3 @@ class RequestState(StatesGroup):
     children = State()
     infants = State()
     page = State()
-
-

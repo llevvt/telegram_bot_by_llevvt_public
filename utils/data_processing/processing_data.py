@@ -4,7 +4,7 @@ from typing import Dict
 import json
 
 
-def processing_data(request_dict: Dict) -> None:
+def processing_data(request_dict: Dict) -> Dict:
     new_dict = dict()
     for i_result in request_dict['results']:
         current_id = i_result["id"]
@@ -22,5 +22,7 @@ def processing_data(request_dict: Dict) -> None:
                     else:
                         new_dict[current_id][i_parameter] = None
 
-    with open(current_request, 'w') as file:
-        json.dump(new_dict, file, indent=4)
+    return new_dict
+
+    # with open(current_request, 'w') as file:
+    #     json.dump(new_dict, file, indent=4)

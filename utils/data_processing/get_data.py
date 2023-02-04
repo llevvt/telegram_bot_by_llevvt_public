@@ -15,6 +15,6 @@ def new_data(location: str = 'Paris', checkin: str = str(current_date), checkout
     querystring["infants"] = infants
     querystring["page"] = page
     new_response = requests.get(url=url, headers=HEADERS, params=querystring)
-    new_data = json.loads(new_response.text)
-    return new_data
+    new_data_dict = json.loads(new_response.text)
+    return new_data_dict
     

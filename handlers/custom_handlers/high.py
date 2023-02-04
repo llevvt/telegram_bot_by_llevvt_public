@@ -1,5 +1,5 @@
 from loader import bot
-from states.request_state import RequestState
+from states.high_state import HighState
 from telebot.types import Message
 import re
 from utils.other_utils.cheking_date import checking_date
@@ -11,15 +11,15 @@ from utils.data_processing.prepare_for_saving import prepare_for_saving
 
 @bot.message_handler(commands=['high'])
 def get_data(message: Message) -> None:
-    bot.set_state(message.from_user.id, RequestState.city, message.chat.id)
+    bot.set_state(message.from_user.id, HighState.city, message.chat.id)
     bot.send_message(message.from_user.id, 'Введи город назначения на английском')
 
 
-@bot.message_handler(state=RequestState.city)
+@bot.message_handler(state=HighState.city)
 def get_city(message: Message):
     if re.match(r'\b[A-Z][a-z]+\b', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введи дату заезда в формате YYYY-MM-DD')
-        bot.set_state(message.from_user.id, RequestState.check_in_date, message.chat.id)
+        bot.set_state(message.from_user.id, HighState.check_in_date, message.chat.id)
 
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['city'] = message.text
@@ -29,11 +29,11 @@ def get_city(message: Message):
                                                'с большой буквы и на английском языке ')
 
 
-@bot.message_handler(state=RequestState.check_in_date)
+@bot.message_handler(state=HighState.check_in_date)
 def get_check_in_date(message):
     if re.match(r'\b\d{4}-\d{2}-\d{2}\b', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введи дату выезда в формате YYYY-MM-DD')
-        bot.set_state(message.from_user.id, RequestState.check_out_date, message.chat.id)
+        bot.set_state(message.from_user.id, HighState.check_out_date, message.chat.id)
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             if checking_date(message.text):
                 data['checkin'] = message.text
@@ -45,11 +45,11 @@ def get_check_in_date(message):
                                                'Например: 1963-11-22')
 
 
-@bot.message_handler(state=RequestState.check_out_date)
+@bot.message_handler(state=HighState.check_out_date)
 def get_check_out_day(message):
     if re.match(r'\b\d{4}-\d{2}-\d{2}\b', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите количество взрослых, которые поедут')
-        bot.set_state(message.from_user.id, RequestState.adults, message.chat.id)
+        bot.set_state(message.from_user.id, HighState.adults, message.chat.id)
 
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             if checking_date(message.text, compare_date=data['checkin']):
@@ -62,12 +62,12 @@ def get_check_out_day(message):
                                                'Например: 1963-11-22')
 
 
-@bot.message_handler(state=RequestState.adults)
+@bot.message_handler(state=HighState.adults)
 def get_adults(message):
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал! Поедут ли с Вами дети? Для ответа нажмите на кнопку.',
                          reply_markup=yes_no())
-        bot.set_state(message.from_user.id, RequestState.children_bool, message.chat.id)
+        bot.set_state(message.from_user.id, HighState.children_bool, message.chat.id)
 
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['adults'] = message.text
@@ -76,11 +76,11 @@ def get_adults(message):
                                                'В вашем сообщении не должно быть букв!')
 
 
-@bot.message_handler(state=RequestState.children_bool)
+@bot.message_handler(state=HighState.children_bool)
 def if_children(message):
     if message.text == 'Да':
         bot.send_message(message.from_user.id, 'Введите пожалуйста количество детей, которые с Вами поедут')
-        bot.set_state(message.from_user.id, RequestState.children, message.chat.id)
+        bot.set_state(message.from_user.id, HighState.children, message.chat.id)
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['children_bool'] = 'Да'
     elif message.text == 'Нет':
@@ -89,16 +89,16 @@ def if_children(message):
             data['infants'] = '0'
             data['children_bool'] = 'Нет'
         bot.send_message(message.from_user.id, 'Спасибо! Теперь введите номер страницы для поиска')
-        bot.set_state(message.from_user.id, RequestState.page, message.chat.id)
+        bot.set_state(message.from_user.id, HighState.page, message.chat.id)
     else:
         bot.send_message(message.from_user.id, 'Для ответа, пожалуйста, нажмите на кнопку.')
 
 
-@bot.message_handler(state=RequestState.children)
+@bot.message_handler(state=HighState.children)
 def get_children(message):
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите количество младенцев, которые поедут')
-        bot.set_state(message.from_user.id, RequestState.infants, message.chat.id)
+        bot.set_state(message.from_user.id, HighState.infants, message.chat.id)
 
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['children'] = message.text
@@ -107,11 +107,11 @@ def get_children(message):
                                                'В вашем сообщении не должно быть букв!')
 
 
-@bot.message_handler(state=RequestState.infants)
+@bot.message_handler(state=HighState.infants)
 def get_infants(message):
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите номер страницы для поиска')
-        bot.set_state(message.from_user.id, RequestState.page, message.chat.id)
+        bot.set_state(message.from_user.id, HighState.page, message.chat.id)
 
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['infants'] = message.text
@@ -120,7 +120,7 @@ def get_infants(message):
                                                'В вашем сообщении не должно быть букв!')
 
 
-@bot.message_handler(state=RequestState.page)
+@bot.message_handler(state=HighState.page)
 def get_page(message):
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал!')
@@ -144,6 +144,7 @@ def get_page(message):
                'Стоимость: {price}$'.format(
                 name=result['name'], link=result['url'], rating=result['rating'], price=result['price']
     )
+
         bot.send_message(message.from_user.id, text)
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте числом номер страницы для поиска!\n'

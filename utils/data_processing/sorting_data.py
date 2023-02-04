@@ -1,17 +1,17 @@
-from typing import List
+from typing import List, Dict, AnyStr
 import json
 from config_data.pathes_data import current_request
 
 
-def sorting_data(parameter: str = 'price') -> List:
-    with open(current_request, 'r') as file:
-        current_data = json.load(file)
-        start_massive = list(current_data.keys())
-        result = quick_sorting(start_massive, current_data, parameter)
-        return result
+def sorting_data(current_data: Dict, parameter: str = 'price') -> List:
+    # with open(current_request, 'r') as file:
+    #     current_data = json.load(file)
+    start_massive = list(current_data.keys())
+    result = quick_sorting(start_massive, current_data, parameter)
+    return result
 
 
-def quick_sorting(massive, data, parameter) -> List:
+def quick_sorting(massive: List, data: Dict, parameter: AnyStr) -> List:
     if len(massive) < 2:
         return massive
     else:
