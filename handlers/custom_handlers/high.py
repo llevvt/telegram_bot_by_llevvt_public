@@ -5,7 +5,7 @@ import re
 from utils.other_utils.cheking_date import checking_date
 from config_data.request_config import current_date, next_date
 from keyboards.reply.yes_no import yes_no
-from handlers.custom_handlers import history, survey, low
+from . import low, history, survey
 from utils.data_processing.prepare_for_saving import prepare_for_saving
 
 
@@ -124,6 +124,7 @@ def get_infants(message):
 def get_page(message):
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал!')
+
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['page'] = message.text
 
@@ -143,9 +144,10 @@ def get_page(message):
                 'Рейтинг: {rating}\n' \
                'Стоимость: {price}$'.format(
                 name=result['name'], link=result['url'], rating=result['rating'], price=result['price']
-    )
+                )
 
         bot.send_message(message.from_user.id, text)
+        bot.set_state(message.from_user.id, None)
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте числом номер страницы для поиска!\n'
                                                'В вашем сообщении не должно быть букв!')

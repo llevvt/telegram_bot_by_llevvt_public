@@ -9,7 +9,7 @@ def save_request(request_dict, user_id):
             cur = database.cursor()
             cur.execute("SELECT * FROM history WHERE userid='{}';".format(str(user_id)))
             results = cur.fetchall()
-            if len(results) <= 9:
+            if len(results) <= 1:
                 add_new_object(request_dict, user_id)
             else:
                 cur.execute("DELETE FROM history WHERE userid='{}'".format(user_id))

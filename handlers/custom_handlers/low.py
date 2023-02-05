@@ -5,7 +5,7 @@ import re
 from utils.other_utils.cheking_date import checking_date
 from config_data.request_config import current_date, next_date
 from keyboards.reply.yes_no import yes_no
-from handlers.custom_handlers import history, survey, high
+from . import high, history, survey
 from utils.data_processing.prepare_for_saving import prepare_for_saving
 
 
@@ -146,6 +146,7 @@ def get_page(message):
     )
 
         bot.send_message(message.from_user.id, text)
+        bot.set_state(message.from_user.id, None)
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте числом номер страницы для поиска!\n'
                                                'В вашем сообщении не должно быть букв!')
