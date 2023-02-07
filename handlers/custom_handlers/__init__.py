@@ -1,3 +1,3 @@
-from . import survey, high, low, history
+from . import survey, high, low, history, commands_handler
 
-__all__ = ['survey', 'high', 'low', 'history']
+__all__ = ['survey', 'high', 'low', 'history', 'commands_handler']

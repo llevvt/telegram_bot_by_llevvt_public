@@ -9,7 +9,7 @@ from . import low, history, survey
 from utils.data_processing.prepare_for_saving import prepare_for_saving
 
 
-@bot.message_handler(commands=['high'])
+# @bot.message_handler(commands=['high'])
 def get_data(message: Message) -> None:
     bot.set_state(message.from_user.id, HighState.city, message.chat.id)
     bot.send_message(message.from_user.id, 'Введи город назначения на английском')
@@ -147,7 +147,7 @@ def get_page(message):
                 )
 
         bot.send_message(message.from_user.id, text)
-        bot.set_state(message.from_user.id, None)
+        bot.set_state(message.from_user.id, None, message.chat.id)
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте числом номер страницы для поиска!\n'
                                                'В вашем сообщении не должно быть букв!')

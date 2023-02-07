@@ -34,4 +34,4 @@ def history(message: Message):
     else:
         bot.send_message(message.from_user.id, 'Ваша история поиска пуста, самое время это исправить :)')
 
-    bot.set_state(message.from_user.id, None)
+    bot.set_state(message.from_user.id, None, message.chat.id)
