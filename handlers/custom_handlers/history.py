@@ -17,8 +17,7 @@ def history(message: Message):
             if len(result) != 0:
                 bot.send_message(message.from_user.id, 'Вот ваша история поиска')
                 for i_request in result:
-                    text = 'ID пользователя: {user_id}\n' \
-                           'Ссылка: {url}\n' \
+                    text = 'Ссылка: {url}\n' \
                            'Название отеля: {hotel_name}\n' \
                            'Город: {city}\n' \
                            'Рейтинг: {rating}\n' \
