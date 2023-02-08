@@ -8,6 +8,7 @@ from keyboards.reply.yes_no import yes_no
 from . import history
 from utils.data_processing.prepare_for_saving import prepare_for_saving
 from typing import Dict, List
+import time
 
 
 @bot.message_handler(commands=['low', 'high', 'custom'])
@@ -202,6 +203,7 @@ def get_max_price(message: Message):
             )
             bot.send_message(message.from_user.id, text)
             bot.set_state(message.from_user.id, None, message.chat.id)
+            time.sleep(0.5)
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте максимальную стоимость числом!\n'
                                                'В вашем сообщении не должно быть букв!')

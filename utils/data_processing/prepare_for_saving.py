@@ -10,17 +10,17 @@ from typing import List
 def prepare_for_saving(message, command, parameters: List[int] = None):
     offer, current_data = get_offer(message=message, command=command, parameters=parameters)
     parameters_for_message = ('name', 'url', 'rating', 'price')
-    if command == 'low' or command == 'high':
+    if command == '/low' or command == '/high':
         result = current_data[offer]
         for i_param in parameters_for_message:
             if i_param not in result.keys():
                 result[i_param] = 'Нет информации'
         save_request(result, user_id=message.from_user.id)
-    elif command == 'custom':
+    elif command == '/custom':
         result = list()
         for i_id in offer:
             for i_param in parameters_for_message:
-                if i_param not in current_data[id].keys():
+                if i_param not in current_data[i_id].keys():
                     current_data[i_id][i_param] = 'Нет информации'
             result.append(current_data[i_id])
             save_request(current_data[i_id], user_id=message.from_user.id)
@@ -43,6 +43,6 @@ def get_offer(message: Message, command: str, parameters: List[int] = None) -> L
     elif command == r'/custom':
         new_list = list()
         for i_id in current_response:
-            if parameters[0] <= sorted_dict[current_response]['price'] <= parameters[1]:
+            if parameters[0] <= sorted_dict[i_id]['price'] <= parameters[1]:
                 new_list.append(i_id)
         return new_list, sorted_dict

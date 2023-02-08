@@ -2,7 +2,7 @@ from keyboards.reply.contact import request_contact
 from loader import bot
 from states.contact_information import UserInfoState
 from telebot.types import Message
-from handlers.custom_handlers import low, history, high
+from handlers.custom_handlers import history, commands_handler
 
 
 @bot.message_handler(commands=['survey'])
