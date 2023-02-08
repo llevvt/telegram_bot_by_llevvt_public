@@ -9,6 +9,7 @@ from . import history
 from utils.data_processing.prepare_for_saving import prepare_for_saving
 from typing import Dict, List
 import time
+from handlers.default_heandlers import help, start
 
 
 @bot.message_handler(commands=['low', 'high', 'custom'])

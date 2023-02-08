@@ -1,7 +1,5 @@
 from config_data.request_config import needed_parameters_of_hotel
-from config_data.pathes_data import current_request
 from typing import Dict
-import json
 
 
 def processing_data(request_dict: Dict) -> Dict:

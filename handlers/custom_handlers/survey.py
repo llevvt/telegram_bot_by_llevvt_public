@@ -3,6 +3,7 @@ from loader import bot
 from states.contact_information import UserInfoState
 from telebot.types import Message
 from handlers.custom_handlers import history, commands_handler
+from handlers.default_heandlers import help, start
 
 
 @bot.message_handler(commands=['survey'])

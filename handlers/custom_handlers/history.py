@@ -5,6 +5,7 @@ import sqlite3
 from telebot.types import Message
 import os
 from handlers.custom_handlers import survey
+from handlers.default_heandlers import help, start
 
 
 @bot.message_handler(commands=['history'])

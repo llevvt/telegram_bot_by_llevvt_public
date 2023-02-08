@@ -1,6 +1,4 @@
 from typing import List, Dict, AnyStr
-import json
-from config_data.pathes_data import current_request
 
 
 def sorting_data(current_data: Dict, parameter: str = 'price') -> List:
