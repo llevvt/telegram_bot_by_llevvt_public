@@ -42,7 +42,10 @@ def get_offer(message: Message, command: str, parameters: List[int] = None) -> L
         return current_response[len(current_response) - 1], sorted_dict
     elif command == r'/custom':
         new_list = list()
-        for i_id in current_response:
-            if parameters[0] <= sorted_dict[i_id]['price'] <= parameters[1]:
-                new_list.append(i_id)
+        i_id = 0
+        while sorted_dict[current_response[i_id]]['price'] <= parameters[1]:
+            if parameters[0] <= sorted_dict[current_response[i_id]]['price'] <= parameters[1]:
+                new_list.append(current_response[i_id])
+            i_id += 1
+
         return new_list, sorted_dict

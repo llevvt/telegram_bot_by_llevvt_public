@@ -194,17 +194,23 @@ def get_max_price(message: Message):
                                                 message=message, command=data['command'],
                                                 parameters=[int(data['min_price']), int(data['max_price'])]
                                                 )
-        for i_result in result:
-            text = 'Вот ваш вариант!\n' \
-                   '\nНазвание: {name}\n' \
-                   'Ссылка: {link}\n' \
-                   'Рейтинг: {rating}\n' \
-                   'Стоимость: {price}$'.format(
-                name=i_result['name'], link=i_result['url'], rating=i_result['rating'], price=i_result['price']
-            )
-            bot.send_message(message.from_user.id, text)
-            bot.set_state(message.from_user.id, None, message.chat.id)
-            time.sleep(0.5)
+        if len(result) != 0:
+            for i_result in result:
+                text = 'Вот ваш вариант!\n' \
+                       '\nНазвание: {name}\n' \
+                       'Ссылка: {link}\n' \
+                       'Рейтинг: {rating}\n' \
+                       'Стоимость: {price}$'.format(
+                    name=i_result['name'], link=i_result['url'], rating=i_result['rating'], price=i_result['price']
+                )
+                bot.send_message(message.from_user.id, text)
+                time.sleep(0.5)
+                bot.set_state(message.from_user.id, None, message.chat.id)
+        else:
+            bot.send_message(message.from_user.id, 'Мы ничего не нашли ничего за такую цену, '
+                                                   'попробуйте изменить диапозон\n'
+                                                   'Пожалуйста, ведите минимальную цену для поиска')
+            bot.set_state(message.from_user.id, RequestState.min_price, message.chat.id)
     else:
         bot.send_message(message.from_user.id, 'Пожалуйста, отправьте максимальную стоимость числом!\n'
                                                'В вашем сообщении не должно быть букв!')
