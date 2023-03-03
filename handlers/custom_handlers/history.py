@@ -4,17 +4,25 @@ from loader import bot
 import sqlite3
 from telebot.types import Message
 import os
+from typing import List
 from handlers.custom_handlers import survey
 from handlers.default_heandlers import help, start
 
 
 @bot.message_handler(commands=['history'])
-def history(message: Message):
+def history(message: Message) -> None:
+    """
+    The function-handler, which gets all items from history.db
+    and sends them to the user.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
     if os.path.exists(history_path):
         with sqlite3.connect(r'{}'.format(history_path)) as database:
             cur = database.cursor()
             cur.execute("SELECT * FROM history WHERE userid='{}'".format(message.from_user.id))
-            result = cur.fetchall()
+            result: List[str] = cur.fetchall()
             if len(result) != 0:
                 bot.send_message(message.from_user.id, 'Вот ваша история поиска')
                 for i_request in result:

@@ -14,6 +14,16 @@ from handlers.default_heandlers import help, start
 
 @bot.message_handler(commands=['low', 'high', 'custom'])
 def get_data(message: Message) -> None:
+    """
+    The start function of 'low', 'high' and 'custom' user scripts. It initiates the user script
+    and sending the instructions to the user. Also, it redirects user to
+    the next stage of the user script - the function get_city.
+
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     bot.set_state(message.from_user.id, RequestState.city, message.chat.id)
     bot.send_message(message.from_user.id, 'Введи город назначения на английском')
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -21,7 +31,17 @@ def get_data(message: Message) -> None:
 
 
 @bot.message_handler(state=RequestState.city)
-def get_city(message: Message):
+def get_city(message: Message) -> None:
+    """
+    The second function in the user script. It retrieves the data from
+    the user about destination city and sends new instructions for the user.
+    Also, it redirects user to the next stage of the user script -
+    the function get_check_in_date.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if re.match(r'\b[A-Z][a-z]+\b', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введи дату заезда в формате YYYY-MM-DD')
         bot.set_state(message.from_user.id, RequestState.check_in_date, message.chat.id)
@@ -35,7 +55,17 @@ def get_city(message: Message):
 
 
 @bot.message_handler(state=RequestState.check_in_date)
-def get_check_in_date(message):
+def get_check_in_date(message:  Message) -> None:
+    """
+    The third function in the user script. It retrieves the data
+    from the user about check-in date and sends new instructions
+    to the user. Also, it redirects user to the next stage of
+    the user script - the function get_check_out_date.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if re.match(r'\b\d{4}-\d{2}-\d{2}\b', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введи дату выезда в формате YYYY-MM-DD')
         bot.set_state(message.from_user.id, RequestState.check_out_date, message.chat.id)
@@ -51,7 +81,17 @@ def get_check_in_date(message):
 
 
 @bot.message_handler(state=RequestState.check_out_date)
-def get_check_out_day(message):
+def get_check_out_date(message: Message) -> None:
+    """
+    The fourth function in the user script. It retrieves the data
+    from the user about check-out date and sends new instructions to the user.
+    Also, it redirects user to the next stage of the user script -
+    the function get_adults.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if re.match(r'\b\d{4}-\d{2}-\d{2}\b', message.text):
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите количество взрослых, которые поедут')
         bot.set_state(message.from_user.id, RequestState.adults, message.chat.id)
@@ -68,7 +108,17 @@ def get_check_out_day(message):
 
 
 @bot.message_handler(state=RequestState.adults)
-def get_adults(message):
+def get_adults(message: Message) -> None:
+    """
+    The fifth function in the user script. It retrieves the data
+    from the user about number of an adults date and sends new
+    instructions to the user. Also, it redirects user to the next
+    stage of the user script - the function if_children.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал! Поедут ли с Вами дети? Для ответа нажмите на кнопку.',
                          reply_markup=yes_no())
@@ -82,7 +132,17 @@ def get_adults(message):
 
 
 @bot.message_handler(state=RequestState.children_bool)
-def if_children(message):
+def if_children(message: Message) -> None:
+    """
+    The sixth function in th user script. This function
+    asking user, would the children go. If not, this function
+    redirects user to the get_page, otherwise it redirects user to the
+    get_children and sends new instructions.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if message.text == 'Да':
         bot.send_message(message.from_user.id, 'Введите пожалуйста количество детей, которые с Вами поедут')
         bot.set_state(message.from_user.id, RequestState.children, message.chat.id)
@@ -100,7 +160,17 @@ def if_children(message):
 
 
 @bot.message_handler(state=RequestState.children)
-def get_children(message):
+def get_children(message: Message) -> None:
+    """
+    This is not essential function in the user script.
+    This function retrieves from the message the data about
+    children number and redirects the user to the
+    next stage of this user script's branch - get_infants.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите количество младенцев, которые поедут')
         bot.set_state(message.from_user.id, RequestState.infants, message.chat.id)
@@ -113,7 +183,17 @@ def get_children(message):
 
 
 @bot.message_handler(state=RequestState.infants)
-def get_infants(message):
+def get_infants(message: Message) -> None:
+    """
+    This is not essential function in the user script.
+    This function retrieves from the message the data about
+    infants number and redirects the user to the
+    next stage of the user script - get_page.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите номер страницы для поиска')
         bot.set_state(message.from_user.id, RequestState.page, message.chat.id)
@@ -126,7 +206,17 @@ def get_infants(message):
 
 
 @bot.message_handler(state=RequestState.page)
-def get_page(message):
+def get_page(message: Message) -> None:
+    """
+    This function retrieve the page number, sends user all received information, sends results
+    of the search and ends user script for 'low' and 'high' user scripts, or
+    retrieve the page number and redirects user to the get_min_price for
+    'custom' user script.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал!')
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -142,14 +232,14 @@ def get_page(message):
                    f'Количество младенцев: {data["infants"]}\n' \
                    f'Страница поиска: {data["page"]}\n'
             bot.send_message(message.from_user.id, text)
-            result = prepare_for_saving(message=message, command=data['command'])
+            result: Dict = prepare_for_saving(message=message, command=data['command'])
             text = 'Вот ваш вариант!\n'\
-                    '\nНазвание: {name}\n'\
-                    'Ссылка: {link}\n'\
-                    'Рейтинг: {rating}\n' \
-                   'Стоимость: {price}$'.format(
+                'Название: {name}\n'\
+                'Ссылка: {link}\n'\
+                'Рейтинг: {rating}\n' \
+                'Стоимость: {price}$'.format(
                     name=result['name'], link=result['url'], rating=result['rating'], price=result['price']
-        )
+                    )
 
             bot.send_message(message.from_user.id, text)
             bot.set_state(message.from_user.id, None, message.chat.id)
@@ -162,7 +252,15 @@ def get_page(message):
 
 
 @bot.message_handler(state=RequestState.min_price)
-def get_min_price(message: Message):
+def get_min_price(message: Message) -> None:
+    """
+    This function retrieves form the user minimal price for the
+    custom search and then redirects the user to the get_max_price.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал! Теперь введите максимальную стоимость для поиска')
         bot.set_state(message.from_user.id, RequestState.max_price, message.chat.id)
@@ -175,7 +273,17 @@ def get_min_price(message: Message):
 
 
 @bot.message_handler(state=RequestState.max_price)
-def get_max_price(message: Message):
+def get_max_price(message: Message) -> None:
+    """
+    This function retrieves maximal price for the custom search.
+    Then this function executes custom search with the provided
+    parameters and sends results of the search to the user.
+    Also, this function ends 'custom' user script.
+
+    :param message: This is a message from the user
+    :type message: Message
+    """
+
     if str(message.text).isdigit():
         bot.send_message(message.from_user.id, 'Спасибо, записал!')
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -201,11 +309,11 @@ def get_max_price(message: Message):
                        'Ссылка: {link}\n' \
                        'Рейтинг: {rating}\n' \
                        'Стоимость: {price}$'.format(
-                    name=i_result['name'], link=i_result['url'], rating=i_result['rating'], price=i_result['price']
-                )
+                        name=i_result['name'], link=i_result['url'], rating=i_result['rating'], price=i_result['price']
+                        )
                 bot.send_message(message.from_user.id, text)
                 time.sleep(0.5)
-                bot.set_state(message.from_user.id, None, message.chat.id)
+            bot.set_state(message.from_user.id, None, message.chat.id)
         else:
             bot.send_message(message.from_user.id, 'Мы ничего не нашли ничего за такую цену, '
                                                    'попробуйте изменить диапозон\n'
